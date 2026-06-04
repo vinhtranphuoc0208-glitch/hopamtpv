@@ -1,0 +1,1025 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hopamTPV — Kho Hợp Âm Trần Phước Vinh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #D93B2B;
+    --red-dark: #A82C1F;
+    --red-light: #F9E8E6;
+    --gold: #C8951A;
+    --gold-light: #FBF3E0;
+    --bg: #FAF8F4;
+    --bg2: #F2EFE8;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.09);
+    --border-strong: rgba(0,0,0,0.18);
+    --text: #1A1714;
+    --text2: #6B6560;
+    --text3: #A09A94;
+    --chord-color: #D93B2B;
+    --radius: 10px;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Playfair Display', serif;
+    --sans: 'Be Vietnam Pro', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--text);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: #FFF;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--red); }
+  nav a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    background: none;
+    font-family: var(--sans);
+  }
+  nav a:hover, nav a.active { color: #fff; background: rgba(255,255,255,0.12); }
+  nav a.admin-btn {
+    background: var(--red);
+    color: #fff;
+    margin-left: 8px;
+  }
+  nav a.admin-btn:hover { background: var(--red-dark); }
+
+  /* PAGES */
+  .page { display: none; padding: 2rem; max-width: 900px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* HERO SEARCH */
+  .hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .hero h1 em { color: var(--red); font-style: normal; }
+  .hero p { color: var(--text2); font-size: 15px; margin-bottom: 1.8rem; }
+
+  .search-bar {
+    display: flex;
+    gap: 8px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .search-bar input {
+    flex: 1;
+    padding: 13px 18px;
+    font-family: var(--sans);
+    font-size: 15px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    outline: none;
+    transition: border 0.2s;
+  }
+  .search-bar input:focus { border-color: var(--red); }
+  .search-bar button {
+    padding: 13px 22px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .search-bar button:hover { background: var(--red-dark); }
+
+  /* SONG GRID */
+  .section-title {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    margin: 2rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-strong);
+  }
+  .song-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .song-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .song-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--red);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .song-card:hover { border-color: rgba(217,59,43,0.3); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+  .song-card:hover::before { opacity: 1; }
+  .song-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .song-card .artist { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+  .song-card .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--red-light);
+    color: var(--red-dark);
+    letter-spacing: 0.5px;
+  }
+  .tag.genre {
+    background: var(--gold-light);
+    color: var(--gold);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text2);
+    font-size: 15px;
+  }
+
+  /* SONG VIEW */
+  .song-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .song-header .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text2);
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    font-family: var(--sans);
+    padding: 0;
+  }
+  .song-header .back-btn:hover { color: var(--red); }
+  .song-header h1 { font-family: var(--serif); font-size: 2rem; font-weight: 900; }
+  .song-header .artist-name { color: var(--text2); font-size: 16px; margin: 4px 0 12px; }
+
+  .transpose-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg2);
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .transpose-bar label { font-size: 13px; color: var(--text2); font-weight: 500; }
+  .transpose-controls { display: flex; align-items: center; gap: 8px; }
+  .t-btn {
+    width: 32px; height: 32px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    color: var(--text);
+    font-family: var(--mono);
+  }
+  .t-btn:hover { background: var(--red); color: #fff; border-color: var(--red); }
+  .t-display {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--red);
+    min-width: 40px;
+    text-align: center;
+  }
+  .t-reset {
+    font-size: 12px;
+    color: var(--text3);
+    cursor: pointer;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    font-family: var(--sans);
+    margin-left: 4px;
+  }
+  .t-reset:hover { color: var(--red); }
+
+  /* CHORD SHEET */
+  .chord-sheet {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 1.8rem;
+    font-family: var(--mono);
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .chord-line {
+    display: block;
+    margin-bottom: 1.4rem;
+  }
+  .lyric-section-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    display: block;
+    margin-bottom: 6px;
+    margin-top: 1rem;
+  }
+  .chord-lyric-row {
+    display: block;
+    white-space: pre;
+    position: relative;
+  }
+  .chords-row {
+    display: block;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--chord-color);
+    white-space: pre;
+    min-height: 1.3em;
+    letter-spacing: 0.2px;
+  }
+  .lyrics-row {
+    display: block;
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--text);
+    white-space: pre;
+    line-height: 1.6;
+  }
+
+  /* ADMIN */
+  .admin-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .admin-panel h2 {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 13px;
+    font-family: var(--sans);
+    font-size: 14px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--bg);
+    outline: none;
+    transition: border 0.2s;
+    color: var(--text);
+    resize: vertical;
+  }
+  .form-group textarea { font-family: var(--mono); font-size: 13px; line-height: 1.6; }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--red); background: var(--surface); }
+
+  .help-text {
+    font-size: 11.5px;
+    color: var(--text3);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .help-text code {
+    background: var(--bg2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    color: var(--red-dark);
+    font-size: 11px;
+  }
+
+  .btn-primary {
+    padding: 11px 24px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-danger {
+    padding: 7px 14px;
+    background: none;
+    color: var(--red);
+    border: 1.5px solid var(--red);
+    border-radius: 7px;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-danger:hover { background: var(--red); color: #fff; }
+
+  .admin-song-list { display: flex; flex-direction: column; gap: 8px; }
+  .admin-song-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .admin-song-item .info { flex: 1; }
+  .admin-song-item .info strong { font-size: 14px; }
+  .admin-song-item .info span { font-size: 12px; color: var(--text2); margin-left: 8px; }
+  .admin-song-item .actions { display: flex; gap: 8px; }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--text);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .password-gate {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+  .password-box {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 2rem;
+    width: 340px;
+    text-align: center;
+  }
+  .password-box h2 { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .password-box p { color: var(--text2); font-size: 13px; margin-bottom: 1.2rem; }
+  .password-box input {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 15px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 8px;
+    font-family: var(--sans);
+    outline: none;
+    margin-bottom: 10px;
+    text-align: center;
+    letter-spacing: 3px;
+  }
+  .password-box input:focus { border-color: var(--red); }
+  .password-box .error { color: var(--red); font-size: 12px; margin-top: 6px; display: none; }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .page { padding: 1rem; }
+    .chord-sheet { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">HợpÂm<span>TPV</div>
+  <div style="display:flex;gap:4px;align-items:center">
+    <a onclick="showPage('home')" id="nav-home" class="active">Trang chủ</a>
+    <a onclick="goAdmin()" id="nav-admin" class="admin-btn">Quản trị</a>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>Kho <em>Hợp Âm</em><br>Trần Phước Vinh</h1>
+    <p>Tra cứu hợp âm, đổi tông dễ dàng cho mọi bài hát</p>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Tìm tên bài hát, ca sĩ..." oninput="doSearch()" onkeydown="if(event.key==='Enter')doSearch()">
+      <button onclick="doSearch()">Tìm kiếm</button>
+    </div>
+  </div>
+
+  <div id="search-results-section" style="display:none">
+    <div class="section-title">Kết quả tìm kiếm</div>
+    <div class="song-grid" id="search-results"></div>
+  </div>
+
+  <div id="all-songs-section">
+    <div class="section-title">Tất cả bài hát</div>
+    <div class="song-grid" id="all-songs-grid"></div>
+  </div>
+</div>
+
+<!-- SONG VIEW PAGE -->
+<div class="page" id="page-song">
+  <div class="song-header">
+    <button class="back-btn" onclick="showPage('home')">← Quay lại</button>
+    <h1 id="view-title"></h1>
+    <div class="artist-name" id="view-artist"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="view-tags"></div>
+  </div>
+
+  <div class="transpose-bar">
+    <label>Đổi tông:</label>
+    <div class="transpose-controls">
+      <button class="t-btn" onclick="transpose(-1)">−</button>
+      <div class="t-display" id="transpose-display">0</div>
+      <button class="t-btn" onclick="transpose(+1)">+</button>
+    </div>
+    <button class="t-reset" onclick="resetTranspose()">Về gốc</button>
+    <span style="font-size:12px;color:var(--text3);margin-left:auto">Tông gốc: <span id="orig-key" style="color:var(--red);font-family:var(--mono);font-weight:600"></span></span>
+  </div>
+
+  <div class="chord-sheet" id="chord-sheet"></div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+    <h1 style="font-family:var(--serif);font-size:1.8rem">Quản trị bài hát</h1>
+    <button class="btn-danger" onclick="logout()">Đăng xuất</button>
+  </div>
+
+  <div class="admin-panel">
+    <h2 id="form-title">➕ Thêm bài hát mới</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tên bài hát *</label>
+        <input type="text" id="f-title" placeholder="VD: Nơi Này Có Anh">
+      </div>
+      <div class="form-group">
+        <label>Ca sĩ / Nhạc sĩ *</label>
+        <input type="text" id="f-artist" placeholder="VD: Sơn Tùng M-TP">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tông gốc</label>
+        <select id="f-key">
+          <option value="C">C</option><option value="C#">C# / Db</option>
+          <option value="D">D</option><option value="D#">D# / Eb</option>
+          <option value="E">E</option><option value="F">F</option>
+          <option value="F#">F# / Gb</option><option value="G" selected>G</option>
+          <option value="G#">G# / Ab</option><option value="A">A</option>
+          <option value="A#">A# / Bb</option><option value="B">B</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Thể loại</label>
+        <input type="text" id="f-genre" placeholder="VD: Ballad, V-pop, Nhạc trẻ">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group full">
+        <label>Nội dung hợp âm & lời *</label>
+        <textarea id="f-content" rows="16" placeholder="Nhập theo định dạng:
+[Verse 1]
+[Am]Đây là [F]lời bài [C]hát
+[G]Tiếp theo [Am]lời [F]ca
+
+[Chorus]
+[C]Điệp khúc [G]bắt đầu
+[Am]Từng [F]câu chữ [C]vang lên"></textarea>
+        <div class="help-text">
+          Định dạng: hợp âm trong ngoặc vuông <code>[Am]</code> ngay trước chữ cần đánh. 
+          Nhãn đoạn: <code>[Verse 1]</code> <code>[Chorus]</code> <code>[Bridge]</code> trên một dòng riêng.
+          Xuống dòng trống để ngăn cách đoạn.
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center">
+      <button class="btn-primary" onclick="saveSong()">💾 Lưu bài hát</button>
+      <button style="padding:11px 20px;background:none;border:1.5px solid var(--border-strong);border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:14px;color:var(--text2)" onclick="cancelEdit()">Huỷ</button>
+    </div>
+  </div>
+
+  <div class="admin-panel">
+    <h2>📋 Danh sách bài hát (<span id="admin-count">0</span>)</h2>
+    <div class="admin-song-list" id="admin-song-list"></div>
+  </div>
+</div>
+
+<!-- Password Gate -->
+<div class="password-gate" id="password-gate" style="display:none">
+  <div class="password-box">
+    <h2>🔐 Quản trị viên</h2>
+    <p>Nhập mật khẩu để tiếp tục</p>
+    <input type="password" id="pw-input" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="btn-primary" style="width:100%" onclick="checkPassword()">Đăng nhập</button>
+    <div class="error" id="pw-error">Mật khẩu không đúng!</div>
+  
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PASSWORD = 'vinh@123';
+let isAdmin = false;
+let editingId = null;
+let currentTranspose = 0;
+let currentSong = null;
+
+const CHROMATIC = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const ENHARMONIC = {'Db':'C#','Eb':'D#','Fb':'E','Gb':'F#','Ab':'G#','Bb':'A#','Cb':'B'};
+
+let songs = JSON.parse(localStorage.getItem('hopam_songs') || 'null') || [
+  {
+    id: 1, title: 'Nơi Này Có Anh', artist: 'Sơn Tùng M-TP', key: 'G', genre: 'V-pop',
+    content: `[Verse 1]
+[Am]Dù [C]cho [G]mưa rơi [Em]xuống
+[Am]Dù [C]cho [G]nắng lung [Em]linh
+[Am]Nơi này có [C]anh bên [G]em mãi [Em]mãi
+[Am]Dù [C]cho [G]đời thay [Em]đổi
+
+[Pre-Chorus]
+[F]Em ơi [C]đừng khóc [G]nữa
+[F]Bờ vai này [C]anh cho [G]em tựa
+[Am]Dù [F]mưa hay [C]nắng [G]cũng có anh
+
+[Chorus]
+[C]Nơi đây có [G]anh, nơi đây có [Am]anh
+[F]Luôn bên cạnh [C]em qua bao [G]năm tháng
+[C]Tình yêu này [G]là, tình yêu này [Am]là
+[F]Mãi trọn vẹn [C]không bao giờ [G]phai`
+  },
+  {
+    id: 2, title: 'Hương Nắng Bình Yên', artist: 'Vũ Cát Tường', key: 'C', genre: 'Ballad',
+    content: `[Intro]
+[C] [G] [Am] [F]
+
+[Verse 1]
+[C]Có những [G]buổi chiều tà
+[Am]Nắng vàng [F]rải khắp nơi
+[C]Em ngồi [G]nhớ về anh
+[Am]Hương nắng [F]thơm trên môi
+
+[Verse 2]
+[C]Bao năm [G]tháng qua rồi
+[Am]Tình ta [F]vẫn còn đây
+[C]Như hương [G]nắng bình yên
+[Am]Nhẹ nhàng [F]mãi chẳng phai
+
+[Chorus]
+[F]Ôi hương [C]nắng bình [G]yên
+[Am]Sưởi ấm [F]trái tim [C]này
+[F]Cho dù [C]mưa hay [G]nắng
+[Am]Tình ta [F]vẫn bền [C]lâu`
+  },
+  {
+    id: 3, title: 'Lạc Trôi', artist: 'Sơn Tùng M-TP', key: 'Am', genre: 'V-pop',
+    content: `[Verse 1]
+[Am]Lạc [F]trôi trong [C]cõi mộng
+[G]Bước chân [Am]vô định [F]về đâu
+[Am]Mây [F]trắng bay [C]lãng đãng
+[G]Theo gió [Am]đưa [F]đi xa
+
+[Pre-Chorus]
+[F]Trong [C]lòng anh [G]có em
+[Am]Như [F]ánh sao [C]dẫn [G]đường
+[F]Dù [C]có lạc [G]trôi
+[Am]Vẫn luôn [F]tìm về [C]em
+
+[Chorus]
+[Am]Lạc [G]trôi, lạc [F]trôi, em ơi
+[C]Tìm [Am]về bên [G]em thôi
+[F]Nơi [C]bình yên [G]nhất đời
+[Am]Là [F]được bên [C]em mãi [G]mãi`
+  }
+];
+
+function saveSongs() { localStorage.setItem('hopam_songs', JSON.stringify(songs)); }
+
+function getNextId() { return songs.length ? Math.max(...songs.map(s => s.id)) + 1 : 1; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  if (page === 'home') {
+    document.getElementById('nav-home').classList.add('active');
+    renderAllSongs();
+  }
+  if (page === 'admin') renderAdminList();
+}
+
+function goAdmin() {
+  if (isAdmin) { showPage('admin'); return; }
+  document.getElementById('password-gate').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').style.display = 'none';
+  setTimeout(() => document.getElementById('pw-input').focus(), 100);
+}
+
+function checkPassword() {
+  const pw = document.getElementById('pw-input').value;
+  if (pw === ADMIN_PASSWORD) {
+    isAdmin = true;
+    document.getElementById('password-gate').style.display = 'none';
+    showPage('admin');
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').select();
+  }
+}
+
+function logout() {
+  isAdmin = false;
+  showPage('home');
+}
+
+// ---- CHORD TRANSPOSITION ----
+function normalizeChord(ch) {
+  return ENHARMONIC[ch] || ch;
+}
+
+function transposeChord(chord, steps) {
+  // chord: e.g. "Am7", "F#maj7", "Dm/G"
+  let bass = '';
+  if (chord.includes('/')) {
+    const parts = chord.split('/');
+    chord = parts[0];
+    bass = '/' + transposeChord(parts[1], steps);
+  }
+  const match = chord.match(/^([A-G][#b]?)(.*)$/);
+  if (!match) return chord;
+  let root = normalizeChord(match[1]);
+  const suffix = match[2];
+  const idx = CHROMATIC.indexOf(root);
+  if (idx === -1) return chord;
+  const newIdx = ((idx + steps) % 12 + 12) % 12;
+  return CHROMATIC[newIdx] + suffix + bass;
+}
+
+function transposeLine(line, steps) {
+  // Replace all [Chord] patterns
+  return line.replace(/\[([A-G][#b]?[^\]]*)\]/g, (match, chord) => {
+    // Check if it's a section label like [Verse 1]
+    if (/^(Verse|Chorus|Bridge|Intro|Outro|Pre|Hook|Refrain|Interlude)/i.test(chord)) return match;
+    return '[' + transposeChord(chord, steps) + ']';
+  });
+}
+
+// ---- RENDER CHORD SHEET ----
+function parseAndRenderContent(content, semitones) {
+  const lines = content.split('\n');
+  let html = '';
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    // Section label: [Verse 1], [Chorus], etc.
+    if (/^\[(Verse|Chorus|Bridge|Intro|Outro|Pre|Hook|Refrain|Interlude)[^\]]*\]$/i.test(line)) {
+      const label = line.replace(/\[|\]/g, '');
+      html += `<span class="lyric-section-label">${label}</span>`;
+      i++;
+      continue;
+    }
+
+    // Empty line
+    if (!line) {
+      html += `<div style="height:0.6rem"></div>`;
+      i++;
+      continue;
+    }
+
+    // Chord+lyric line: has [Chord] patterns mixed with text
+    if (/\[[A-G][#b]?[^\]]*\]/.test(line)) {
+      const transposed = transposeLine(line, semitones);
+      const {chordsRow, lyricsRow} = buildChordLyricRows(transposed);
+      html += `<div class="chord-line">
+        <span class="chords-row">${chordsRow}</span>
+        <span class="lyrics-row">${lyricsRow}</span>
+      </div>`;
+    } else {
+      // Pure lyric line
+      html += `<div class="chord-line">
+        <span class="chords-row"></span>
+        <span class="lyrics-row">${escapeHtml(line)}</span>
+      </div>`;
+    }
+    i++;
+  }
+  return html;
+}
+
+function buildChordLyricRows(line) {
+  // Split line into [Chord] and text tokens, build two parallel lines
+  let chordRow = '';
+  let lyricRow = '';
+  const tokens = line.split(/(\[[^\]]+\])/);
+  let col = 0;
+
+  for (let t of tokens) {
+    if (/^\[[^\]]+\]$/.test(t)) {
+      const chord = t.slice(1, -1);
+      // Pad chord row to current col, then place chord
+      while (chordRow.length < col) chordRow += ' ';
+      chordRow += chord;
+    } else {
+      // Plain text: pad lyric row to col, then place text
+      while (lyricRow.length < col) lyricRow += ' ';
+      lyricRow += t;
+      col = Math.max(chordRow.length, lyricRow.length);
+    }
+  }
+  // Final alignment
+  return {
+    chordsRow: escapeHtml(chordRow) || '&nbsp;',
+    lyricsRow: escapeHtml(lyricRow) || '&nbsp;'
+  };
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ---- SONG VIEW ----
+function openSong(id) {
+  const song = songs.find(s => s.id === id);
+  if (!song) return;
+  currentSong = song;
+  currentTranspose = 0;
+  document.getElementById('view-title').textContent = song.title;
+  document.getElementById('view-artist').textContent = song.artist;
+  document.getElementById('transpose-display').textContent = '0';
+  document.getElementById('orig-key').textContent = song.key;
+
+  const tagsEl = document.getElementById('view-tags');
+  tagsEl.innerHTML = `<span class="tag">${song.key}</span>` +
+    (song.genre ? `<span class="tag genre">${song.genre}</span>` : '');
+
+  renderChordSheet();
+  showPage('song');
+}
+
+function renderChordSheet() {
+  document.getElementById('chord-sheet').innerHTML =
+    parseAndRenderContent(currentSong.content, currentTranspose);
+  // Update tông display
+  const rootNorm = normalizeChord(currentSong.key);
+  const idx = CHROMATIC.indexOf(rootNorm);
+  const newKey = idx >= 0 ? CHROMATIC[((idx + currentTranspose) % 12 + 12) % 12] : currentSong.key;
+  document.getElementById('orig-key').textContent = newKey + (currentTranspose !== 0 ? ` (${currentTranspose > 0 ? '+' : ''}${currentTranspose})` : '');
+}
+
+function transpose(delta) {
+  currentTranspose = ((currentTranspose + delta) % 12 + 12) % 12;
+  if (currentTranspose > 6) currentTranspose -= 12;
+  document.getElementById('transpose-display').textContent = (currentTranspose > 0 ? '+' : '') + currentTranspose;
+  renderChordSheet();
+}
+
+function resetTranspose() {
+  currentTranspose = 0;
+  document.getElementById('transpose-display').textContent = '0';
+  renderChordSheet();
+}
+
+// ---- SEARCH ----
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const resSection = document.getElementById('search-results-section');
+  const allSection = document.getElementById('all-songs-section');
+
+  if (!q) {
+    resSection.style.display = 'none';
+    allSection.style.display = 'block';
+    renderAllSongs();
+    return;
+  }
+
+  const results = songs.filter(s =>
+    s.title.toLowerCase().includes(q) ||
+    s.artist.toLowerCase().includes(q) ||
+    (s.genre && s.genre.toLowerCase().includes(q))
+  );
+
+  resSection.style.display = 'block';
+  allSection.style.display = 'none';
+
+  const el = document.getElementById('search-results');
+  if (results.length === 0) {
+    el.innerHTML = `<div class="no-results">Không tìm thấy bài hát nào cho "<strong>${escapeHtml(q)}</strong>"</div>`;
+  } else {
+    el.innerHTML = results.map(songCard).join('');
+  }
+}
+
+function songCard(s) {
+  return `<div class="song-card" onclick="openSong(${s.id})">
+    <h3>${escapeHtml(s.title)}</h3>
+    <div class="artist">${escapeHtml(s.artist)}</div>
+    <div class="meta">
+      <span class="tag">${escapeHtml(s.key)}</span>
+      ${s.genre ? `<span class="tag genre">${escapeHtml(s.genre)}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderAllSongs() {
+  const el = document.getElementById('all-songs-grid');
+  if (songs.length === 0) {
+    el.innerHTML = `<div class="no-results" style="grid-column:1/-1">Chưa có bài hát nào. <a href="#" onclick="goAdmin()" style="color:var(--red)">Thêm bài hát</a> ngay!</div>`;
+  } else {
+    el.innerHTML = songs.map(songCard).join('');
+  }
+}
+
+// ---- ADMIN ----
+function renderAdminList() {
+  document.getElementById('admin-count').textContent = songs.length;
+  const el = document.getElementById('admin-song-list');
+  if (songs.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text2);font-size:14px">Chưa có bài hát nào.</div>`;
+    return;
+  }
+  el.innerHTML = songs.map(s => `
+    <div class="admin-song-item">
+      <div class="info">
+        <strong>${escapeHtml(s.title)}</strong>
+        <span>${escapeHtml(s.artist)}</span>
+        <span class="tag" style="margin-left:8px">${escapeHtml(s.key)}</span>
+      </div>
+      <div class="actions">
+        <button class="btn-danger" style="background:var(--surface);color:var(--text);border-color:var(--border-strong)" onclick="editSong(${s.id})">✏️ Sửa</button>
+        <button class="btn-danger" onclick="deleteSong(${s.id})">🗑️ Xoá</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveSong() {
+  const title = document.getElementById('f-title').value.trim();
+  const artist = document.getElementById('f-artist').value.trim();
+  const key = document.getElementById('f-key').value;
+  const genre = document.getElementById('f-genre').value.trim();
+  const content = document.getElementById('f-content').value.trim();
+
+  if (!title || !artist || !content) {
+    showToast('⚠️ Vui lòng điền đầy đủ thông tin!');
+    return;
+  }
+
+  if (editingId !== null) {
+    const idx = songs.findIndex(s => s.id === editingId);
+    songs[idx] = { id: editingId, title, artist, key, genre, content };
+    showToast('✅ Đã cập nhật bài hát!');
+  } else {
+    songs.push({ id: getNextId(), title, artist, key, genre, content });
+    showToast('✅ Đã thêm bài hát mới!');
+  }
+
+  saveSongs();
+  cancelEdit();
+  renderAdminList();
+}
+
+function editSong(id) {
+  const s = songs.find(s => s.id === id);
+  if (!s) return;
+  editingId = id;
+  document.getElementById('f-title').value = s.title;
+  document.getElementById('f-artist').value = s.artist;
+  document.getElementById('f-key').value = s.key;
+  document.getElementById('f-genre').value = s.genre || '';
+  document.getElementById('f-content').value = s.content;
+  document.getElementById('form-title').textContent = '✏️ Chỉnh sửa bài hát';
+  document.querySelector('.admin-panel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-artist').value = '';
+  document.getElementById('f-key').value = 'G';
+  document.getElementById('f-genre').value = '';
+  document.getElementById('f-content').value = '';
+  document.getElementById('form-title').textContent = '➕ Thêm bài hát mới';
+}
+
+function deleteSong(id) {
+  if (!confirm('Xoá bài hát này?')) return;
+  songs = songs.filter(s => s.id !== id);
+  saveSongs();
+  renderAdminList();
+  showToast('🗑️ Đã xoá bài hát!');
+}
+
+// Init
+renderAllSongs();
+</script>
+</body>
+</html>
